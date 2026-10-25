@@ -273,7 +273,7 @@ export const DOCUMENT_CSS = `
 :root{--fg:#1d1d1f;--muted:#6e6e73;--line:#e3e3e8;--bg:#fff;--soft:#f5f5f7;--code:#f6f7f9;--accent:#3a3ad6}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.72 system-ui,-apple-system,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.72 system-ui,-apple-system,"Segoe UI","Yu Gothic UI","Yu Gothic","Meiryo","Noto Sans JP","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
 main{max-width:840px;margin:0 auto;padding:48px 28px 96px}
 .doc-head{padding-bottom:20px;margin-bottom:8px;border-bottom:1px solid var(--line)}
 .doc-head h1{font-size:26px;line-height:1.3;margin:0 0 10px;letter-spacing:-.01em}

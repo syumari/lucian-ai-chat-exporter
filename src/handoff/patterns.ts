@@ -88,32 +88,57 @@ const EN = {
   ask: /\b(explain|what is|what are|what'?s|how (do|does|can|should)|why (do|does|is|are)|tell me (about|more)|difference between|compare)\b/i,
 };
 
+// Explicit Japanese signals, matching the same categories as Korean and English.
+const JA = {
+  directive: /(してください|してほしい|して欲しい|してくれ|しよう|しましょう|すること|お願いします|お願い|必要です|必要だ|実装して|作成して|変更して|追加して|修正して|使って|保存して)/,
+  prohibit: /(しないで|してはいけない|してはならない|禁止|使用しない|使わない|削除しない|変更しない|追加しない|許可しない)/,
+  constraint: /(必ず|のみ使用|だけ使|除外|以内|以下に|超えない|制限|維持して|保持して)/,
+  decision: /(に決定|で決定|を採用|に確定|で確定|にしよう|で進め|ことにした|ことにします|ことにする)/,
+  change: /(変更|訂正|取り消|撤回|代わりに|戻して|やり直|ではなく|じゃなく)/,
+  done: /(完了しました|完了した|完了です|実装しました|実装した|追加しました|修正しました|解決しました|保存しました|合格しました|成功しました)/,
+  notDone: /(未完了|未実装|未確認|まだ.{0,12}(していない|していません|できていない)|完了していない|完了していません)/,
+  todo: /(未完了|未実装|未確認|残っている|残りの|次の作業|次の手順|予定|計画|対応中|進行中)/,
+  next: /(次の作業|次の手順|次のステップ|次に|続いて|引き続き|残りの作業)/,
+  failure: /(エラー|失敗|不具合|動かない|動作しない|タイムアウト|クラッシュ|欠落)/,
+  cause: /(原因|ために|理由は|理由が)/,
+  question: /(ですか|ますか|かな|だろうか|でしょうか)[？?。]?$/,
+  goal: /(目的|目標|作りたい|作成したい|実現したい|構築したい|開発したい|プロジェクト)/,
+  emphasis: /(重要|必ず|絶対|最優先|注意|強調)/,
+  confirm: /^(はい|うん|了解|了承|承認|それでお願い|それで進め|そのまま進め|お願いします|いいね|オーケー)/,
+  polite: /^(もちろん|承知しました|了解しました|いい質問|お役に立て)/,
+  recommend: /(おすすめ|お勧め|推奨|提案します|提案する)/,
+  permit: /(使用してよい|使用していい|使ってよい|使っていい|許可します|許可する|制限を解除)/,
+  ask: /(教えて|説明して|比較して|違いは|どうすれば|について知りたい)/,
+  lead: /(要点は|要約すると|まとめると|結論は|結論から|最終判断)/,
+  pending: /(未完了|未実装|未確認|まだ.{0,12}(していない|していません|できていない)|完了していない|完了していません)/,
+};
+
 /** Classifies a prose unit. `role` lets user-only signals (confirmations) apply correctly. */
 export function classify(text: string, role: 'user' | 'assistant'): number {
   let f = 0;
   const t = text;
-  if (KO.directive.test(t) || EN.directive.test(t)) f |= F.DIRECTIVE;
-  if (KO.prohibit.test(t) || EN.prohibit.test(t)) f |= F.PROHIBIT | F.CONSTRAINT;
-  else if (KO.constraint.test(t) || EN.constraint.test(t)) f |= F.CONSTRAINT;
-  if (KO.decision.test(t) || EN.decision.test(t)) f |= F.DECISION;
-  if (KO.change.test(t) || EN.change.test(t)) f |= F.CHANGE;
-  if (KO.done.test(t) || EN.done.test(t) || /^\s*[-*]\s*\[[xX]\]/.test(t)) f |= F.DONE;
-  if (KO.notDone.test(t) || EN.notDone.test(t)) f |= F.NOT_DONE;
-  if (KO.todo.test(t) || EN.todo.test(t) || /^\s*[-*]\s*\[ \]/.test(t)) f |= F.TODO;
-  if (KO.next.test(t) || EN.next.test(t)) f |= F.NEXT;
-  if (KO.failure.test(t) || EN.failure.test(t)) f |= F.FAILURE;
-  if (KO.cause.test(t) || EN.cause.test(t)) f |= F.CAUSE;
-  if (/[?？]\s*$/.test(t) || KO.question.test(t)) f |= F.QUESTION;
-  if (KO.goal.test(t) || EN.goal.test(t)) f |= F.GOAL;
-  if (KO.emphasis.test(t) || EN.emphasis.test(t) || /\*\*[^*]+\*\*/.test(t) || /\b[A-Z]{4,}\b/.test(t)) f |= F.EMPHASIS;
-  if (KO.recommend.test(t) || EN.recommend.test(t)) f |= F.RECOMMEND;
-  if (KO.permit.test(t) || EN.permit.test(t)) f |= F.PERMIT;
-  if (KO.ask.test(t) || EN.ask.test(t)) f |= F.ASK;
-  if (KO.lead.test(t) || EN.lead.test(t)) f |= F.LEAD;
-  if (KO.pending.test(t) || EN.pending.test(t)) f |= F.PENDING;
+  if (JA.directive.test(t) || KO.directive.test(t) || EN.directive.test(t)) f |= F.DIRECTIVE;
+  if (JA.prohibit.test(t) || KO.prohibit.test(t) || EN.prohibit.test(t)) f |= F.PROHIBIT | F.CONSTRAINT;
+  else if (JA.constraint.test(t) || KO.constraint.test(t) || EN.constraint.test(t)) f |= F.CONSTRAINT;
+  if (JA.decision.test(t) || KO.decision.test(t) || EN.decision.test(t)) f |= F.DECISION;
+  if (JA.change.test(t) || KO.change.test(t) || EN.change.test(t)) f |= F.CHANGE;
+  if (JA.done.test(t) || KO.done.test(t) || EN.done.test(t) || /^\s*[-*]\s*\[[xX]\]/.test(t)) f |= F.DONE;
+  if (JA.notDone.test(t) || KO.notDone.test(t) || EN.notDone.test(t)) f |= F.NOT_DONE;
+  if (JA.todo.test(t) || KO.todo.test(t) || EN.todo.test(t) || /^\s*[-*]\s*\[ \]/.test(t)) f |= F.TODO;
+  if (JA.next.test(t) || KO.next.test(t) || EN.next.test(t)) f |= F.NEXT;
+  if (JA.failure.test(t) || KO.failure.test(t) || EN.failure.test(t)) f |= F.FAILURE;
+  if (JA.cause.test(t) || KO.cause.test(t) || EN.cause.test(t)) f |= F.CAUSE;
+  if (/[?？]\s*$/.test(t) || JA.question.test(t) || KO.question.test(t)) f |= F.QUESTION;
+  if (JA.goal.test(t) || KO.goal.test(t) || EN.goal.test(t)) f |= F.GOAL;
+  if (JA.emphasis.test(t) || KO.emphasis.test(t) || EN.emphasis.test(t) || /\*\*[^*]+\*\*/.test(t) || /\b[A-Z]{4,}\b/.test(t)) f |= F.EMPHASIS;
+  if (JA.recommend.test(t) || KO.recommend.test(t) || EN.recommend.test(t)) f |= F.RECOMMEND;
+  if (JA.permit.test(t) || KO.permit.test(t) || EN.permit.test(t)) f |= F.PERMIT;
+  if (JA.ask.test(t) || KO.ask.test(t) || EN.ask.test(t)) f |= F.ASK;
+  if (JA.lead.test(t) || KO.lead.test(t) || EN.lead.test(t)) f |= F.LEAD;
+  if (JA.pending.test(t) || KO.pending.test(t) || EN.pending.test(t)) f |= F.PENDING;
   const trimmed = t.trim();
-  if (role === 'user' && trimmed.length <= 60 && (KO.confirm.test(trimmed) || EN.confirm.test(trimmed))) f |= F.CONFIRM;
-  if (role === 'assistant' && (KO.polite.test(trimmed) || EN.polite.test(trimmed))) f |= F.POLITE;
+  if (role === 'user' && trimmed.length <= 60 && (JA.confirm.test(trimmed) || KO.confirm.test(trimmed) || EN.confirm.test(trimmed))) f |= F.CONFIRM;
+  if (role === 'assistant' && (JA.polite.test(trimmed) || KO.polite.test(trimmed) || EN.polite.test(trimmed))) f |= F.POLITE;
   return f;
 }
 
@@ -151,9 +176,9 @@ const IMG_MD_RE = /!\[([^\]\n]*)\]\((\S+?)(?:\s+"[^"]*")?\)/g;
  * Images are only named in a handoff: the next AI cannot open them, and service links are often
  * signed and private (e.g. chatgpt.com/backend-api/estuary/content?…&sig=…).
  */
-export function nameImages(md: string, lang: 'ko' | 'en'): string {
+export function nameImages(md: string, lang: 'ko' | 'en' | 'ja'): string {
   if (!md.includes('![')) return md;
-  const label = lang === 'ko' ? '이미지' : 'image';
+  const label = lang === 'ja' ? '画像' : lang === 'ko' ? '이미지' : 'image';
   return replaceOutsideCode(md, (seg) =>
     seg.replace(IMG_MD_RE, (_, alt: string, url: string) => {
       const a = alt.trim();

@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "Lucian AI Chat Exporter"
+  },
+  "appDesc": {
+    "message": "ChatGPT・Claude・Gemini・Grokの会話を別のAIに引き継いだり、PDF・Markdown・Word・HWPXなどに書き出せます。"
+  }
+}

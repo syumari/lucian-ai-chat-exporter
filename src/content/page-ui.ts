@@ -69,7 +69,7 @@ const PANEL_CSS = `
   position: fixed; z-index: 2147483646; width: 304px; max-height: min(560px, calc(100vh - 16px)); overflow: auto;
   box-sizing: border-box; padding: 12px; border-radius: 14px; background: var(--bg); color: var(--text);
   border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(0,0,0,.16), 0 2px 6px rgba(0,0,0,.08);
-  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  font: 13px/1.5 system-ui, -apple-system, "Segoe UI","Yu Gothic UI","Yu Gothic","Meiryo","Noto Sans JP", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
   word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased;
   opacity: 0; transform: translateY(4px); transition: opacity .14s ease, transform .14s ease;
 }

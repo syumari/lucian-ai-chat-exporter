@@ -106,16 +106,18 @@ export function verificationReportMarkdown(
   extra: { files?: Array<{ path: string; status: string }>; timings?: JobTimings; exportedAt?: number } = {},
 ): string {
   const lines: string[] = [];
+  const label = (en: string, ja: string) => locale === 'ja' ? ja : en;
+  const status = (v: string) => locale === 'ja' ? ({ pass: '合格', warn: '警告', fail: '失敗', info: '情報' }[v] ?? v) : v;
   lines.push(`# ${t(locale, 'doc.report')}`);
   lines.push('');
   lines.push(`- ${conv.title || conv.siteName}`);
   lines.push(`- ${t(locale, 'doc.source')}: ${sourceDomain(conv)} — ${conv.fromUrl}`);
   lines.push(`- ${t(locale, 'doc.exportedAt')}: ${formatDateTime(extra.exportedAt ?? Date.now())}`);
-  lines.push(`- level: **${verification.level}**`);
+  lines.push(`- ${label('level', '結果')}: **${status(verification.level)}**`);
   lines.push('');
   lines.push('| | |');
   lines.push('|---|---|');
-  for (const c of verification.checks) lines.push(`| ${ICON[c.status]} ${c.status} | ${checkText(locale, c).replace(/\|/g, '\\|')} |`);
+  for (const c of verification.checks) lines.push(`| ${ICON[c.status]} ${status(c.status)} | ${checkText(locale, c).replace(/\|/g, '\\|')} |`);
   lines.push('');
   const k = verification.counts;
   lines.push('```json');
@@ -124,25 +126,25 @@ export function verificationReportMarkdown(
   if (extra.timings) {
     lines.push('');
     const tm = extra.timings;
-    lines.push(`- network: ${formatMs(tm.networkMs)} · parse: ${formatMs(tm.parseMs)} · collect: ${formatMs(tm.collectMs)} · assets: ${formatMs(tm.assetsMs)} · build: ${formatMs(tm.processMs)}`);
+    lines.push(`- ${label('network', '通信')}: ${formatMs(tm.networkMs)} · ${label('parse', '解析')}: ${formatMs(tm.parseMs)} · ${label('collect', '取得')}: ${formatMs(tm.collectMs)} · ${label('assets', '画像・添付')}: ${formatMs(tm.assetsMs)} · ${label('build', '作成')}: ${formatMs(tm.processMs)}`);
   }
   if (extra.files?.length) {
     lines.push('');
-    lines.push('| file | status |');
+    lines.push(locale === 'ja' ? '| ファイル | 状態 |' : '| file | status |');
     lines.push('|---|---|');
     for (const f of extra.files) lines.push(`| ${f.path} | ${f.status} |`);
   }
   const ex = conv.extraction;
   if (ex.skipped.length || ex.missingNodeIds.length || ex.warnings.length) {
     lines.push('');
-    lines.push('<details><summary>extraction details</summary>');
+    lines.push(`<details><summary>${label('extraction details', '抽出の詳細')}</summary>`);
     lines.push('');
-    if (ex.missingNodeIds.length) lines.push(`- missing node ids: ${ex.missingNodeIds.join(', ')}`);
-    if (ex.missingKinds?.length) lines.push(`- missing node kinds: ${ex.missingKinds.join(', ')}`);
-    if (ex.warnings.length) lines.push(`- warnings: ${ex.warnings.join(', ')}`);
+    if (ex.missingNodeIds.length) lines.push(`- ${label('missing node ids', '欠落ノードID')}: ${ex.missingNodeIds.join(', ')}`);
+    if (ex.missingKinds?.length) lines.push(`- ${label('missing node kinds', '欠落ノードの種類')}: ${ex.missingKinds.join(', ')}`);
+    if (ex.warnings.length) lines.push(`- ${label('warnings', '警告')}: ${ex.warnings.join(', ')}`);
     const reasons = new Map<string, number>();
     for (const s of ex.skipped) reasons.set(s.reason, (reasons.get(s.reason) ?? 0) + 1);
-    for (const [r, n] of reasons) lines.push(`- skipped ${r}: ${n}`);
+    for (const [r, n] of reasons) lines.push(`- ${label('skipped', '除外')} ${r}: ${n}`);
     lines.push('');
     lines.push('</details>');
   }

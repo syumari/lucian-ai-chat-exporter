@@ -425,12 +425,12 @@ export async function buildDocx(
     description: `${conv.siteName} conversation export`,
     styles: {
       default: {
-        document: { run: { font: BODY_FONT, size: 21 }, paragraph: { spacing: { after: 120, line: 300 } } },
-        title: { run: { font: BODY_FONT, size: 40, bold: true, color: '1D1D1F' }, paragraph: { spacing: { after: 80 } } },
-        heading3: { run: { font: BODY_FONT, size: 26, bold: true, color: '1D1D1F' }, paragraph: { spacing: { before: 200, after: 80 } } },
-        heading4: { run: { font: BODY_FONT, size: 23, bold: true, color: '1D1D1F' }, paragraph: { spacing: { before: 160, after: 60 } } },
-        heading5: { run: { font: BODY_FONT, size: 21, bold: true, color: '1D1D1F' } },
-        heading6: { run: { font: BODY_FONT, size: 21, bold: true, color: '4A4A50' } },
+        document: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 21 }, paragraph: { spacing: { after: 120, line: 300 } } },
+        title: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 40, bold: true, color: '1D1D1F' }, paragraph: { spacing: { after: 80 } } },
+        heading3: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 26, bold: true, color: '1D1D1F' }, paragraph: { spacing: { before: 200, after: 80 } } },
+        heading4: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 23, bold: true, color: '1D1D1F' }, paragraph: { spacing: { before: 160, after: 60 } } },
+        heading5: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 21, bold: true, color: '1D1D1F' } },
+        heading6: { run: { font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) }, size: 21, bold: true, color: '4A4A50' } },
         hyperlink: { run: { color: '3A3AD6', underline: {} } },
       },
       paragraphStyles: [
@@ -439,7 +439,7 @@ export async function buildDocx(
           name: 'Lucian Message',
           basedOn: 'Normal',
           next: 'Normal',
-          run: { bold: true, size: 22, color: '1D1D1F', font: BODY_FONT },
+          run: { bold: true, size: 22, color: '1D1D1F', font: { ...BODY_FONT, ...(opts.locale === 'ja' ? { eastAsia: 'Yu Gothic' } : {}) } },
           paragraph: {
             keepNext: true,
             outlineLevel: 1,

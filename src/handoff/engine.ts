@@ -29,7 +29,7 @@ export interface HandoffTimings {
 
 export interface HandoffResult {
   markdown: string;
-  lang: 'ko' | 'en';
+  lang: 'ko' | 'en' | 'ja';
   stats: HandoffStats & { uncertain: number; outputChars: number };
   timings: HandoffTimings;
   cache: CacheMap;
@@ -197,8 +197,9 @@ export function fullExportTokens(conv: Conversation, now = Date.now()): number {
  * message, so one long English paste (a log, a terminal screen) does not turn a Korean user's
  * handoff into English (v1.3.8).
  */
-export function detectLanguage(conv: Conversation): 'ko' | 'en' {
+export function detectLanguage(conv: Conversation): 'ko' | 'en' | 'ja' {
   let ko = 0;
+  let ja = 0;
   let counted = 0;
   for (const msg of conv.messages) {
     if (msg.role !== 'user') continue;
@@ -206,10 +207,12 @@ export function detectLanguage(conv: Conversation): 'ko' | 'en' {
       .filter((c) => c.type === 'text' || c.type === 'markdown')
       .map((c) => c.content ?? '')
       .join('\n');
-    if (!/[A-Za-z가-힣]/.test(text)) continue;
+    if (!/[A-Za-z가-힣ぁ-んァ-ヶ一-龯]/.test(text)) continue;
     counted++;
+    if (/[ぁ-んァ-ヶ]/.test(text)) ja++;
     if (hangulRatio(text) >= 0.2) ko++;
   }
+  if (counted && ja * 3 >= counted && ja > ko) return 'ja';
   if (counted) return ko * 3 >= counted ? 'ko' : 'en';
   return hangulRatio(conv.messages.map((m) => m.contents.map((c) => c.content ?? '').join(' ')).join(' ').slice(0, 40_000)) >= 0.2 ? 'ko' : 'en';
 }
@@ -710,7 +713,7 @@ interface BuildCtx {
   msgTokens: Float64Array;
   msgUnitStart: Int32Array;
   confirmedMsgs: Set<number>;
-  lang: 'ko' | 'en';
+  lang: 'ko' | 'en' | 'ja';
   now: number;
 }
 
@@ -733,7 +736,7 @@ function messageText(msg: Conversation['messages'][number]): string {
 }
 
 /** Body of one message for the transcript sections: no source lists, headings demoted below ours. */
-export function transcriptBody(msg: Conversation['messages'][number], lang: 'ko' | 'en'): string {
+export function transcriptBody(msg: Conversation['messages'][number], lang: 'ko' | 'en' | 'ja'): string {
   const body = nameImages(messageBodyMarkdown({ ...msg, contents: msg.contents.filter((c) => c.type !== 'sources') }, { locale: lang }), lang);
   // Message headings ("# 결론", "## 1. …") would otherwise read as sections of the handoff itself.
   return replaceOutsideCode(body, (seg) =>
@@ -1415,7 +1418,7 @@ function buildDocument(conv: Conversation, a: Analysis, ctx: BuildCtx): HandoffD
       }
       const lines = u.text.split('\n');
       const truncated = lines.length > 220;
-      const note = ctx.lang === 'ko' ? `… (${lines.length - 200}줄 생략 — 전체는 [#m${u.m + 1}])` : `… (${lines.length - 200} lines omitted — see [#m${u.m + 1}])`;
+      const note = ctx.lang === 'ja' ? `…（${lines.length - 200}行省略。全文は[#m${u.m + 1}]を参照）` : ctx.lang === 'ko' ? `… (${lines.length - 200}줄 생략 — 전체는 [#m${u.m + 1}])` : `… (${lines.length - 200} lines omitted — see [#m${u.m + 1}])`;
       const body = truncated ? [...lines.slice(0, 170), note, ...lines.slice(-30)].join('\n') : u.text;
       const tok = estimateTokens(body);
       if (usedTok + tok > codeBudget) continue;
@@ -1649,9 +1652,9 @@ const REPEAT_MIN = 24;
 const REPEAT_COMPARISONS = 2_000_000;
 
 /** The note that replaces a run of lines repeated in a later transcript message. */
-export function repeatNote(n: number, ms: number[], lang: 'ko' | 'en'): string {
+export function repeatNote(n: number, ms: number[], lang: 'ko' | 'en' | 'ja'): string {
   const refs = [...new Set(ms)].sort((a, b) => a - b).map((m) => `[#m${m + 1}]`).join(', ');
-  return lang === 'ko'
+  return lang === 'ja' ? `_(… ${n}行省略。同じ、またはほぼ同じ内容が下記の${refs}にあります)_` : lang === 'ko'
     ? `_(… ${n}줄 생략 — 같거나 거의 같은 내용이 아래 ${refs}에 있습니다)_`
     : `_(… ${n} ${n === 1 ? 'line' : 'lines'} omitted — the same or nearly the same text is in ${refs} below)_`;
 }
@@ -1667,7 +1670,7 @@ export function repeatNote(n: number, ms: number[], lang: 'ko' | 'en'): string {
  * never dropped (a table without its header row is no table), and a run stays as it was when the
  * note would be longer than the lines it replaces (v1.3.8).
  */
-export function collapseRepeats(recent: Array<{ m: number; role: string; body: string }>, lang: 'ko' | 'en'): void {
+export function collapseRepeats(recent: Array<{ m: number; role: string; body: string }>, lang: 'ko' | 'en' | 'ja'): void {
   // A user's line only collapses into a later user message (their own revised paste), so what the
   // user said is never shown only as the AI's words. An AI line may point to either.
   interface Index {
@@ -1778,7 +1781,7 @@ export function collapseRepeats(recent: Array<{ m: number; role: string; body: s
 }
 
 /** Keeps the head and tail of a long Markdown body and keeps code fences balanced. */
-export function clipMarkdown(body: string, maxTokens: number, lang: 'ko' | 'en' = 'en'): string {
+export function clipMarkdown(body: string, maxTokens: number, lang: 'ko' | 'en' | 'ja' = 'en'): string {
   const lines = body.split('\n');
   const tokens = lines.map((l) => estimateTokens(l) + 1);
   const headBudget = maxTokens * 0.6;
@@ -1797,7 +1800,7 @@ export function clipMarkdown(body: string, maxTokens: number, lang: 'ko' | 'en' 
   const omittedTokens = Math.round(omitted.reduce((s, l) => s + estimateTokens(l), 0));
   const out = [...head];
   if (fenceCount(head) % 2 === 1) out.push('```');
-  out.push('', lang === 'ko' ? `… [약 ${omittedTokens.toLocaleString('en-US')}토큰 생략] …` : `… [omitted ~${omittedTokens} tokens] …`, '');
+  out.push('', lang === 'ja' ? `…［約${omittedTokens}トークン省略］…` : lang === 'ko' ? `… [약 ${omittedTokens.toLocaleString('en-US')}토큰 생략] …` : `… [omitted ~${omittedTokens} tokens] …`, '');
   if ((fenceCount(head) + fenceCount(omitted)) % 2 === 1) out.push('```');
   out.push(...tail);
   return out.join('\n');

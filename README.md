@@ -1,3 +1,42 @@
+# Lucian AI Chat Exporter 日本語対応版
+
+ChatGPT・Claude・Gemini・Grokの会話を、別のAIに引き継いだり、PDF・Markdown・Wordなどで保存するChrome拡張機能です。
+
+**このリポジトリは[Seokwoooo/lucian-ai-chat-exporter](https://github.com/Seokwoooo/lucian-ai-chat-exporter)の非公式日本語対応forkです。** 元の作者による公式日本語版ではありません。MITライセンスと元の著作権・ライブラリの表記を保持しています。
+
+**[日本語版をダウンロード](https://github.com/syumari/lucian-ai-chat-exporter/releases/latest)** · **[日本語の導入手順・使い方](README.ja.md)** · [元のプロジェクト](https://github.com/Seokwoooo/lucian-ai-chat-exporter)
+
+## インストール
+
+1. [Releases](https://github.com/syumari/lucian-ai-chat-exporter/releases/latest)のAssetsから **`lucian-ai-chat-exporter-ja-v1.3.10.zip`** をダウンロードして、すべて展開します。GitHubが自動生成する「Source code」は開発者向けです。
+2. Chromeで `chrome://extensions` を開き、「デベロッパー モード」をオンにします。
+3. 「パッケージ化されていない拡張機能を読み込む」から、`manifest.json` が直接入っているフォルダーを選びます。
+4. 開いていたAIサービスの会話タブを再読み込みします。
+
+ブラウザーの表示言語が日本語なら、日本語で表示されます。読み込んだフォルダーはそのまま残してください。手動導入版の自動更新はありません。
+
+## 日本語対応の内容
+
+- 操作画面、会話画面のパネル、進捗、エラー、画像の保存方法、検証結果。
+- 書き出す文書の見出し、検証レポート、PDFの印刷案内。
+- 引き継ぎ文書の見出しと案内、日本語会話の言語判定、日本語の基本的な抽出ルール。
+- 日本語フォント候補とWord用の日本語フォント。
+
+会話本文そのものを翻訳する機能ではありません。引き継ぎは外部AIを使わず、重要な文を原文から抜粋します。
+
+<img src="docs/images/japanese-popup.png" alt="日本語版の操作画面" width="360">
+
+## 検証
+
+上流v1.3.10（`f65cdc8414546754d37d0fbb692a5db70aeb4e26`）を基にしています。Windowsのローカル環境で型チェック・Lint・テスト174件、4サービスの模擬サイトを使うE2Eテスト11件が成功しました。日本語UIから全形式の保存・引き継ぎ・PDF出力も確認しました。
+
+ログイン済みの実サービス、Edge、Word・ハングルアプリ本体での動作は今回検証していません。詳細は[日本語の説明](README.ja.md)を参照してください。
+
+---
+
+<details>
+<summary>元プロジェクトのREADME（韓国語・英語）</summary>
+
 # Lucian AI Chat Exporter
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/mkgfcdegdibhhkkcilhmdkfkfboenmeh?label=Chrome%20Web%20Store&color=1a1a1a)](https://chromewebstore.google.com/detail/lucian-ai-chat-exporter/mkgfcdegdibhhkkcilhmdkfkfboenmeh)
@@ -195,3 +234,5 @@ Both features open from a small **Lucian button under every finished answer** (n
 **Development:** `npm ci && npm run check`, `npm run test:e2e` (after `npm run e2e:install-chrome`), `npm run package`.
 
 MIT licensed. Service names and logos (ChatGPT/OpenAI, Claude/Anthropic, Gemini/Google, Grok/xAI) are trademarks of their owners, used only to name the services; this project is not affiliated with any of them.
+
+</details>

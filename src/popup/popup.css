@@ -43,7 +43,7 @@ body {
   width: 360px;
   background: var(--bg);
   color: var(--text);
-  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  font: 13px/1.5 system-ui, -apple-system, "Segoe UI","Yu Gothic UI","Yu Gothic","Meiryo","Noto Sans JP", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
   -webkit-font-smoothing: antialiased;
   word-break: keep-all;
   overflow-wrap: anywhere;

@@ -1,3 +1,4 @@
+import { ja } from './ja';
 // Renders the handoff document. Section order follows the product spec: source info, goal and
 // request flow, confirmed decisions, instructions & constraints, completed work, current state,
 // open work, next steps, failed attempts, code/files, links, past context, transcript,
@@ -82,7 +83,7 @@ export interface RecentMessage {
 }
 
 export interface HandoffDoc {
-  lang: 'ko' | 'en';
+  lang: 'ko' | 'en' | 'ja';
   /** Appendix table of referenced messages that are not in the transcript. */
   refIndex: boolean;
   conv: Conversation;
@@ -128,6 +129,7 @@ export interface HandoffDoc {
 }
 
 const L = {
+  ja,
   ko: {
     title: 'AI 작업 인수인계',
     intro: {
@@ -376,7 +378,7 @@ export function renderHandoff(doc: HandoffDoc): string {
   out.push(`| ${S.metaRows.url} | ${conv.fromUrl} |`);
   out.push(`| ${S.metaRows.extracted} | ${formatDateTime(doc.now)} |`);
   out.push(`| ${S.metaRows.messages} | ${conv.messages.length} |`);
-  out.push(`| ${S.metaRows.size} | ~${doc.sourceTokens.toLocaleString('en-US')} tokens |`);
+  out.push(`| ${S.metaRows.size} | ~${doc.sourceTokens.toLocaleString('en-US')} ${doc.lang === 'ja' ? 'トークン' : 'tokens'} |`);
   out.push(`| ${S.metaRows.mode} | ${fill(S.modeCompressed, { budget: doc.budget.toLocaleString('en-US') })} |`);
   out.push('');
 
@@ -624,7 +626,7 @@ export function renderHandoff(doc: HandoffDoc): string {
 }
 
 /** The beginning of `text` within `max` tokens, cut at a space or line end, code fences closed. */
-export function clipHead(text: string, max: number, lang: 'ko' | 'en'): string {
+export function clipHead(text: string, max: number, lang: 'ko' | 'en' | 'ja'): string {
   if (estimateTokens(text) <= max) return text;
   const note = L[lang].clippedTail;
   const room = max - estimateTokens(note) - 4;
@@ -675,7 +677,7 @@ export const CONDENSED_FRAMES: CondensedFrame[] = [
   { intro: 'none', meta: false, footer: false },
 ];
 
-export function renderCondensedHandoff(conv: Conversation, lang: 'ko' | 'en', messages: CondensedMessage[], opts: CondensedFrame & { sourceTokens: number; now: number }): string {
+export function renderCondensedHandoff(conv: Conversation, lang: 'ko' | 'en' | 'ja', messages: CondensedMessage[], opts: CondensedFrame & { sourceTokens: number; now: number }): string {
   const S = L[lang];
   const roleName = (role: Role) => (role === 'user' ? S.user : conv.siteName);
   const out = [`# ${S.title} — ${conv.title || conv.siteName}`, ''];
@@ -722,7 +724,7 @@ export function renderCondensedHandoff(conv: Conversation, lang: 'ko' | 'en', me
  * Structure check for the verification report: the sections every handoff has (others are left
  * out when empty), in order, plus at least one message reference.
  */
-export function verifyHandoffMarkdown(md: string, lang: 'ko' | 'en'): { ok: boolean; detail?: string } {
+export function verifyHandoffMarkdown(md: string, lang: 'ko' | 'en' | 'ja'): { ok: boolean; detail?: string } {
   const S = L[lang];
   const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // The condensed form of a short conversation: reader note and the key sentences of each message.

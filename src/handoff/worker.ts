@@ -17,7 +17,7 @@ export type WorkerMessage =
   | {
       type: 'done';
       markdown: string;
-      lang: 'ko' | 'en';
+      lang: 'ko' | 'en' | 'ja';
       stats: ReturnType<typeof runHandoff>['stats'];
       timings: ReturnType<typeof runHandoff>['timings'] & { loadMs: number; cacheSaveMs: number };
     }

@@ -1,11 +1,13 @@
+import { ja } from './ja';
 // Single dictionary for every user-facing string (popup, exported documents, verification report).
 // Offscreen documents cannot use chrome.i18n, so localization is done in plain TypeScript.
-// Korean is the default; English is used when the browser UI language is not Korean.
+// Japanese, Korean and English are selected from the browser UI language.
 // English counts use `{n:singular|plural}` (see fillTemplate) so "1 table" never reads "1 tables".
 
-export type Locale = 'ko' | 'en';
+export type Locale = 'ko' | 'en' | 'ja';
 
 const ko = {
+  'app.privacy': '브라우저 안에서만 처리',
   'app.name': 'Lucian AI Chat Exporter',
   'page.button': 'Lucian — AI 인수인계 · 대화 내보내기',
   'page.close': '닫기',
@@ -184,6 +186,7 @@ const ko = {
 export type MessageKey = keyof typeof ko;
 
 const en: Record<MessageKey, string> = {
+  'app.privacy': 'Processed locally',
   'app.name': 'Lucian AI Chat Exporter',
   'page.button': 'Lucian — AI handoff · export conversation',
   'page.close': 'Close',
@@ -359,10 +362,11 @@ const en: Record<MessageKey, string> = {
   'print.missing': 'Conversation data was not found. Run the export again from the extension.',
 };
 
-export const DICTS: Record<Locale, Record<MessageKey, string>> = { ko, en };
+export const DICTS: Record<Locale, Record<MessageKey, string>> = { ko, en, ja };
 
 export function detectLocale(lang?: string): Locale {
   const l = (lang ?? (typeof navigator !== 'undefined' ? navigator.language : 'ko')).toLowerCase();
+  if (l.startsWith('ja')) return 'ja';
   if (l.startsWith('ko')) return 'ko';
   if (l.startsWith('en')) return 'en';
   // Korean is the product default for other languages too.

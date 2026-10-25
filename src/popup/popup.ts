@@ -69,7 +69,7 @@ async function init(): Promise<void> {
   document.documentElement.lang = locale;
   for (const el of document.querySelectorAll<HTMLElement>('[data-i18n]')) el.textContent = t(locale, el.dataset.i18n as MessageKey);
   $('version').textContent = `v${chrome.runtime.getManifest().version}`;
-  $('privacy').textContent = locale === 'ko' ? '브라우저 안에서만 처리' : 'Processed locally';
+  $('privacy').textContent = t(locale, 'app.privacy');
   requestAnimationFrame(() => requestAnimationFrame(() => (document.body.dataset.ready = '1')));
 
   const primary = $('primaryFormats');

@@ -37,7 +37,7 @@ describe('English counts in the UI and the verification report', () => {
   });
 
   it('every template fills completely with counts of 1 and 2', () => {
-    for (const locale of ['ko', 'en'] as Locale[]) {
+    for (const locale of ['ko', 'en', 'ja'] as Locale[]) {
       for (const [key, raw] of Object.entries(DICTS[locale]) as Array<[MessageKey, string]>) {
         const names = [...raw.matchAll(/\{(\w+)[}:]/g)].map((m) => m[1]);
         for (const v of [1, 2]) {
@@ -50,7 +50,7 @@ describe('English counts in the UI and the verification report', () => {
 
   it('format labels are short enough for the three-column format grid', () => {
     // Longer labels were cut off in the popup ("Hangul (H…", "ZIP full bac…").
-    for (const locale of ['ko', 'en'] as Locale[]) {
+    for (const locale of ['ko', 'en', 'ja'] as Locale[]) {
       for (const f of ['pdf', 'md', 'docx', 'hwpx', 'html', 'txt', 'json', 'zip']) {
         expect(t(locale, `format.${f}` as MessageKey).length, `${locale} ${f}`).toBeLessThanOrEqual(10);
       }
@@ -62,7 +62,7 @@ describe('English counts in the UI and the verification report', () => {
     expect(t('en', 'choose.md.title', { n: 1 })).toBe('What to do with the image?');
     expect(t('en', 'choose.md.title', { n: 3 })).toBe('What to do with the 3 images?');
     // One line each, so the three choices fit the popup and the page panel without wrapping.
-    for (const locale of ['ko', 'en'] as Locale[]) {
+    for (const locale of ['ko', 'en', 'ja'] as Locale[]) {
       for (const m of ['zip', 'folder', 'none']) {
         expect(t(locale, `choose.md.${m}Desc` as MessageKey).length, `${locale} ${m}`).toBeLessThanOrEqual(40);
       }
